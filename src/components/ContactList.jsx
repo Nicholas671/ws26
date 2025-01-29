@@ -1,52 +1,41 @@
+// ContactList component
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ContactRow from './ContactRow';
 
-import React, { useState, useEffect } from 'react'
-import ContactRow from './ContactRow'
+function ContactList({ setSelectedContact })// Destructuring setSelectedContact from props
+{
+    const [contacts, setContacts] = useState([]);// Initializing contacts state with an empty array
 
-const dummyContacts = [
-    { id: 1, name: "R2-D2", phone: "222-222-2222", email: "r2d2@droids.com" },
-    { id: 2, name: "C-3PO", phone: "333-333-3333", email: "c3po@droids.com" },
-    { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
-]
+    useEffect(() => {// Fetching contacts from the API
+        axios('https://jsonplaceholder.typicode.com/users')
+            .then((data) => {
+                setContacts(data.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
 
-function ContactList() {
-    const [contacts, setContacts] = useState(dummyContacts)
-    console.log("Contacts: ", contacts)
-    useEffect(() => {
-        async function fetchContacts() {
-            try {
-                const response = await fetch("https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users")
-                const data = await response.json()
-                setContacts(data);
-                console.log(data);
-
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-        fetchContacts()
-    }, [])  // empty array means run once
-
-
-    return (
-        <table><thead>
-            <tr>
-                <th colSpan="3">Contact List
-                </th>
-            </tr>
-        </thead>
-            <tbody>
+    return (// Rendering the contact list
+        <table>
+            <thead>
+                <tr>
+                    <th colSpan="3">Contact List</th>
+                </tr>
                 <tr>
                     <td>Name</td>
                     <td>Email</td>
                     <td>Phone</td>
                 </tr>
-                {contacts.map((contact) => {
-                    return <ContactRow key={contact.id} contact={contact} />
-                })}
+            </thead>
+            <tbody>
+                {contacts.map((contact) => (// Mapping over the contacts array
+                    <ContactRow key={contact.id} contact={contact} setSelectedContact={setSelectedContact} />
+                ))}
             </tbody>
         </table>
-    )
+    );
 }
 
-export default ContactList
+export default ContactList;
